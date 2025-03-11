@@ -1,2 +1,4 @@
-# This is a repository for completing the John Crickett Coding Challenges
-Hello
+### Coding Challenges README
+
+# Challenge One
+Build your own version of the Unix command line tool wc!
