@@ -1,4 +1,4 @@
-### Coding Challenges README
+# Coding Challenges README
 
-# Challenge One
+## Challenge One
 Build your own version of the Unix command line tool wc!
