@@ -13,82 +13,30 @@ var rootCmd = &cobra.Command{
 	Long: `ccwc is a CLI tool for the Code Challenge Workshop. It is a collection of challenges to help you improve your programming skills.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(os.Args) < 3 {
-			fmt.Println("Please provide flag for how to count the file.")
-			return
-		}
-
-		if len(os.Args) < 4 {
-			fmt.Println("Please provide a file name as a command-line argument.")
-			return
-		}
-
-		filename := os.Args[3]
-		file, err := os.Open(filename)
-
-		if err != nil {
-			fmt.Printf("Error reading file: %v\n", err)
-			return
-		}
-
-		defer file.Close()
-
 		if (cmd.Flags().Lookup("c").Changed) {
-			file, err := os.Open(filename)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
-			}
-			defer file.Close()
-			var totalCount int
-			var continueCount bool = true
-
-			for continueCount {
-				buf := make([]byte, 1024)
-				n, err := file.Read(buf)
-				if n == 0 {
-					continueCount = false
-				} else {
-					totalCount += n
-			
-					if err != nil {
-						fmt.Println("Error:", err)
-						return
-					}
-				}
-			}
-
-			fmt.Println(totalCount, filename)
+			filename := os.Args[3]
+			byteCount := CountBytes(filename)
+			fmt.Println(byteCount, filename)
 		} else if (cmd.Flags().Lookup("w").Changed) {
-			scanner := bufio.NewScanner(file)
-			scanner.Split(bufio.ScanWords)
-
-			count := 0
-			for scanner.Scan() {
-				count++
-			}
-
-			fmt.Println(count, filename)
+			filename := os.Args[3]
+			wordCount := CountWords(filename)
+			fmt.Println(wordCount, filename)
 		} else if (cmd.Flags().Lookup("l").Changed) {
-			scanner := bufio.NewScanner(file)
-			scanner.Split(bufio.ScanLines)
-
-			count := 0
-			for scanner.Scan() {
-				count++
-			}
-
-			fmt.Println(count, filename)
+			filename := os.Args[3]
+			lineCount := CountLines(filename)
+			fmt.Println(lineCount, filename)
 		} else if (cmd.Flags().Lookup("m").Changed) {
-			scanner := bufio.NewScanner(file)
-			scanner.Split(bufio.ScanRunes)
+			filename := os.Args[3]
+			runeCount := CountRunes(filename)
+			fmt.Println(runeCount, filename)
+		} else {
+			filename := os.Args[2]
 
-			count := 0
-			for scanner.Scan() {
-				count++
-			}
+			wordCount := CountWords(filename)
+			lineCount := CountLines(filename)
+			runeCount := CountRunes(filename)
 
-			fmt.Println(count, filename)
+			fmt.Println(lineCount, wordCount, runeCount, filename)
 		}
 	},
 }
@@ -107,4 +55,98 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func CountWords(filename string) int {
+	file, err := os.Open(filename)
+
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		return 0
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanWords)
+
+	count := 0
+	for scanner.Scan() {
+		count++
+	}
+
+	return count
+}
+
+func CountBytes(filename string) int {
+	file, err := os.Open(filename)
+
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		return 0
+	}
+
+	defer file.Close()
+
+	var totalCount int
+	var continueCount bool = true
+
+	for continueCount {
+		buf := make([]byte, 1024)
+		n, err := file.Read(buf)
+		if n == 0 {
+			continueCount = false
+		} else {
+			totalCount += n
+			
+			if err != nil {
+				fmt.Println("Error:", err)
+				return 0
+			}
+		}
+	}
+
+	return totalCount
+}
+
+func CountLines(filename string) int {
+	file, err := os.Open(filename)
+
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		return 0
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+
+	count := 0
+	for scanner.Scan() {
+		count++
+	}
+
+	return count
+}
+
+func CountRunes(filename string) int {
+	file, err := os.Open(filename)
+
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		return 0
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanRunes)
+
+	count := 0
+	for scanner.Scan() {
+		count++
+	}
+
+	return count
 }
