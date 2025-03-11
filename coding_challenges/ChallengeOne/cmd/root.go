@@ -34,15 +34,31 @@ var rootCmd = &cobra.Command{
 		defer file.Close()
 
 		if (cmd.Flags().Lookup("c").Changed) {
-			scanner := bufio.NewScanner(file)
-			scanner.Split(bufio.ScanBytes)
+			file, err := os.Open(filename)
+			if err != nil {
+				fmt.Println("Error:", err)
+				return
+			}
+			defer file.Close()
+			var totalCount int
+			var continueCount bool = true
 
-			count := 0
-			for scanner.Scan() {
-				count++
+			for continueCount {
+				buf := make([]byte, 1024)
+				n, err := file.Read(buf)
+				if n == 0 {
+					continueCount = false
+				} else {
+					totalCount += n
+			
+					if err != nil {
+						fmt.Println("Error:", err)
+						return
+					}
+				}
 			}
 
-			fmt.Println(count, filename)
+			fmt.Println(totalCount, filename)
 		} else if (cmd.Flags().Lookup("w").Changed) {
 			scanner := bufio.NewScanner(file)
 			scanner.Split(bufio.ScanWords)
