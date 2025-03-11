@@ -1,4 +1,4 @@
-module challenge-one
+module ChallengeOne
 
 go 1.20
 
